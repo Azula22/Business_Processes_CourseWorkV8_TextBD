@@ -35,11 +35,11 @@ public class Main extends Application {
     TableColumn clmn_name = new TableColumn("Назва матеріалу");
     TableColumn clmn_priceOne = new TableColumn("Ціна за одиницю");
     TableColumn clmn_priceAll = new TableColumn("Загальна ціна");
-    TableColumn clmn_dateOFreceiv = new TableColumn("Дата отримання");
-    TableColumn clmn_amount = new TableColumn("Кількість");
-    TableColumn clmn_measureValue = new TableColumn("Величина вимірювання");
+    TableColumn clmn_dateOFreceiv = new TableColumn("Дата отрим.");
+    TableColumn clmn_amount = new TableColumn("Кільк.");
+    TableColumn clmn_measureValue = new TableColumn("Од. вим.");
     TableColumn clmn_resp_person = new TableColumn("Відповідальна особа");
-    TableColumn clmn_debitDate = new TableColumn("Дата списання");
+    TableColumn clmn_debitDate = new TableColumn("Дата спис.");
 
     //Табличка руху матеріальних цінностей
     private TableView tableViewMotion = new TableView();
@@ -79,7 +79,7 @@ public class Main extends Application {
     Button button_property_coming = new Button("Оформлення приходу матеріалів");
     Button button_property_consumption = new Button("Оформлення витрат матеріалів");
     Button button_writeOff_property = new Button("Списані матеріальні цінності");
-    Button button_attorney = new Button("Виписка довіреностей");
+    //Button button_attorney = new Button("Виписка довіреностей");
     Button button_form_report_come = new Button("Cформувати звіт");
     VBox buttonsVBox = new VBox();
 
@@ -96,7 +96,7 @@ public class Main extends Application {
 
     //Для зображення списаних матеріальних цінностей
     WriteOffDatabase writeOffDatabase = new WriteOffDatabase();
-    private  ObservableList dataWriteOff = FXCollections.observableArrayList();
+    private ObservableList dataWriteOff = FXCollections.observableArrayList();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -136,8 +136,9 @@ public class Main extends Application {
     void setStartInterface() {
         //Додали зображення
         startImageView.setImage(srartingImage);
-        mainVBox.getChildren().setAll(lb_greeteng, startImageView);
-
+        startImageView.setFitWidth(1000);
+        mainVBox.getChildren().setAll(startImageView);
+        mainVBox.setSpacing(5);
         //Додали кнопки
         setButtonsOnLeft();
         startingHBox.getChildren().setAll(mainVBox, buttonsVBox);
@@ -147,14 +148,22 @@ public class Main extends Application {
     void setComingTangiblesInterface() {
         textFieldsName.setPromptText("Назва матеріалу");
         textFieldsAmount.setPromptText("Кількість (цифра)");
-        textFieldsMeasureValue.setPromptText("Вимірювальна величина");
-        textFieldsPrice.setPromptText("Ціна (формат #.##)");
+        textFieldsMeasureValue.setPromptText("Од. вим.");
+        textFieldsPrice.setPromptText("Ціна (#.##)");
         textFieldsPersons.setPromptText("Відповідальна особа");
-        datePickersDebitting.setPromptText("Дата списання");
+        datePickersDebitting.setPromptText("Дата спис.");
+
+        textFieldsName.setPrefWidth(200);
+        textFieldsAmount.setPrefWidth(200);
+        textFieldsMeasureValue.setPrefWidth(100);
+        textFieldsPrice.setPrefWidth(100);
+        textFieldsPersons.setPrefWidth(200);
+        datePickersDebitting.setPrefWidth(115);
+
     }
 
     void makeTableForTangibles() {
-        tableViewTang.setPrefWidth(1000);
+        tableViewTang.setPrefHeight(1000);
         clmn_id.setCellValueFactory(new PropertyValueFactory<>("idd"));
         clmn_name.setCellValueFactory(new PropertyValueFactory<>("tangName"));
         clmn_amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
@@ -164,6 +173,17 @@ public class Main extends Application {
         clmn_resp_person.setCellValueFactory(new PropertyValueFactory<>("responsible"));
         clmn_dateOFreceiv.setCellValueFactory(new PropertyValueFactory<>("receivingDate"));
         clmn_debitDate.setCellValueFactory(new PropertyValueFactory<>("debittingDate"));
+
+        clmn_id.setPrefWidth(50);
+        clmn_name.setPrefWidth(200);
+        clmn_amount.setPrefWidth(70);
+        clmn_measureValue.setPrefWidth(70);
+        clmn_priceOne.setPrefWidth(100);
+        clmn_priceAll.setPrefWidth(100);
+        clmn_resp_person.setPrefWidth(200);
+        clmn_dateOFreceiv.setPrefWidth(130);
+        clmn_debitDate.setPrefWidth(130);
+
 
         tableViewTang.getColumns().setAll(clmn_id,
                 clmn_name,
@@ -177,38 +197,62 @@ public class Main extends Application {
     }
 
     void makeTableForWriteOff() {
-        tableViewWriteOff.setPrefWidth(1000);
+
         clmn_NameWriteOff.setCellValueFactory(new PropertyValueFactory<>("name"));
         clmn_DateOfWriteOff.setCellValueFactory(new PropertyValueFactory<>("debittingDate"));
         clmn_dateAmountWriteOff.setCellValueFactory(new PropertyValueFactory<>("amount"));
         clmn_datePriceWriteOff.setCellValueFactory(new PropertyValueFactory<>("money"));
         clmn_dateMeasValWriteOff.setCellValueFactory(new PropertyValueFactory<>("measVal"));
+
+        clmn_NameWriteOff.setPrefWidth(200);
+        clmn_DateOfWriteOff.setPrefWidth(200);
+        clmn_dateAmountWriteOff.setPrefWidth(200);
+        clmn_datePriceWriteOff.setPrefWidth(200);
+        clmn_dateMeasValWriteOff.setPrefWidth(200);
+
+        tableViewWriteOff.setPrefHeight(1000);
+
         tableViewWriteOff.getColumns().setAll(clmn_NameWriteOff,
                 clmn_DateOfWriteOff,
                 clmn_dateAmountWriteOff,
                 clmn_dateMeasValWriteOff,
                 clmn_datePriceWriteOff);
+        tableViewWriteOff.setPadding(new Insets(5));
     }
 
     void makeTableForMotion() {
-        tableViewMotion.setPrefWidth(1000);
+
         clmn_NameMotion.setCellValueFactory(new PropertyValueFactory<>("name"));
         clmn_amountMotion.setCellValueFactory(new PropertyValueFactory<>("change"));
         clmn_priceMotion.setCellValueFactory(new PropertyValueFactory<>("money"));
         clmn_dateMotion.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        clmn_NameMotion.setPrefWidth(400);
+        clmn_amountMotion.setPrefWidth(200);
+        clmn_priceMotion.setPrefWidth(200);
+        clmn_dateMotion.setPrefWidth(200);
+
         tableViewMotion.getColumns().setAll(clmn_NameMotion,
                 clmn_amountMotion,
                 clmn_priceMotion,
                 clmn_dateMotion);
+
+        tableViewMotion.setPrefHeight(1000);
+        tableViewMotion.setPadding(new Insets(5));
     }
 
     void setButtonsOnLeft() {
+        button_handbook_of_property.setPrefHeight(200);
+        button_handbook_of_property.setPrefWidth(350);
+        button_motion_property.setPrefSize(350, 200);
+        button_property_coming.setPrefSize(350, 200);
+        button_property_consumption.setPrefSize(350, 200);
+        button_writeOff_property.setPrefSize(350, 200);
         buttonsVBox.getChildren().setAll(button_handbook_of_property,
                 button_motion_property,
                 button_property_coming,
                 button_property_consumption,
-                button_writeOff_property,
-                button_attorney);
+                button_writeOff_property);
         buttonsVBox.setPadding(new Insets(5));
         buttonsVBox.setSpacing(5);
     }
@@ -249,18 +293,23 @@ public class Main extends Application {
 
     private void lookForWriteOff() {
         LinkedList list = tangiblesDataBase.readData();
-        for(Object a: list){
+        for (Object a : list) {
             String[] lists = a.toString().split("<>@#_");
-            if(LocalDate.parse(lists[7]).isBefore(LocalDate.now())){
+            if (LocalDate.parse(lists[7]).isBefore(LocalDate.now())) {
                 WriteOffTangible writeOffTangible = new WriteOffTangible(lists[1],
                         LocalDate.parse(lists[7]),
                         Integer.parseInt(lists[2]),
                         lists[3],
                         Double.parseDouble(lists[5]));
                 writeOffDatabase.writeData(writeOffTangible);
-                tangiblesDataBase.deleteTangiblesWithSettedAmount(Integer.parseInt(lists[0]),Integer.parseInt(lists[2]));
+                tangiblesDataBase.deleteTangiblesWithSettedAmount(Integer.parseInt(lists[0]), Integer.parseInt(lists[2]));
+                Motion motion = new Motion(writeOffTangible.name, " - " + writeOffTangible.amount, " - ", LocalDate.now());
+                motionDataBase.writeData(motion);
+
             }
         }
+        DBWork();
+        mainVBox.getChildren().setAll(tableViewWriteOff);
     }
 
     private void setInterfaceForWritingOffProperty() {
@@ -287,10 +336,7 @@ public class Main extends Application {
 
         mainVBox.getChildren().setAll(hBoxTakeTangibles, button_submit_adding, tableViewTang, button_form_report_come);
         //Зробити звіт
-        button_form_report_come.setOnAction((ActionEvent rep) -> {
-            formReportForLeaving();
-
-        });
+        button_form_report_come.setOnAction((ActionEvent rep) -> formReportForLeaving());
     }
 
     private void formReportForLeaving() {
@@ -310,8 +356,13 @@ public class Main extends Application {
     }
 
     private void setInterfaceForPropertyLeaving() {
+        hBoxTakeTangibles.setSpacing(5);
+        hBoxTakeTangibles.setPadding(new Insets(5));
         hBoxTakeTangibles.getChildren().setAll(textFieldId,
                 textFieldsAmountOut, textFieldsPriceForOneOut);
+        textFieldId.setPromptText("ID цінності");
+        textFieldsAmountOut.setPromptText("Кількість мат. цінності");
+        textFieldsPriceForOneOut.setPromptText("Ціна за одиницю");
         mainVBox.getChildren().setAll(hBoxTakeTangibles, button_submit_out, tableViewTang);
     }
 
@@ -390,12 +441,16 @@ public class Main extends Application {
     }
 
     private void setInterfaceForPropertyComing() {
+        hBoxTakeTangibles.setSpacing(5);
+        hBoxTakeTangibles.setPadding(new Insets(5));
         hBoxTakeTangibles.getChildren().setAll(textFieldsName,
                 textFieldsAmount,
                 textFieldsMeasureValue,
                 textFieldsPrice,
                 textFieldsPersons,
                 datePickersDebitting);
+        mainVBox.setSpacing(5);
+        mainVBox.setPadding(new Insets(5));
         mainVBox.getChildren().setAll(hBoxTakeTangibles, button_submit_adding, tableViewTang);
     }
 
