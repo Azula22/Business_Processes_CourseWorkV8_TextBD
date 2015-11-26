@@ -6,8 +6,11 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 
 public class TangiblePersonDatabase implements ManageData {
+    TangibleAndPerson tangibleAndPersonForLeaving = new TangibleAndPerson(-1, "0", 0, "0", 0.0, 0.0, "0", LocalDate.now());
+    int gettedMoney;
     final File file = new File("TangiblesData.txt");
     int idTangible = 0;
+    public int selledAmount;
 
     @Override
     public void clear() {
@@ -47,7 +50,7 @@ public class TangiblePersonDatabase implements ManageData {
     public ObservableList<TangibleAndPerson> listFromReaded() {
         ObservableList<TangibleAndPerson> olist = FXCollections.observableArrayList();
         LinkedList linkedList = this.readData();
-        if(linkedList!=null) {
+        if (linkedList != null) {
             for (Object a : linkedList) {
                 String[] list = divideStringOnElements(a);
                 System.out.println(a.toString());
@@ -78,9 +81,64 @@ public class TangiblePersonDatabase implements ManageData {
         return a.toString().split("<>@#_");
     }
 
-      /*  ObservableList<TangibleAndPerson> deleteTangiblesWithSettedAmount(int idd, int amount) {
+    public ObservableList deleteTangiblesWithSettedAmount(int textid, int amount) {
         ObservableList<TangibleAndPerson> olist = FXCollections.observableArrayList();
-        LinkedList<TangibleAndPerson> tangibles = new LinkedList<>();
+        LinkedList<TangibleAndPerson> tangiblesssss = new LinkedList<>();
         LinkedList linkedList = this.readData();
-    }*/
+        for (Object a : linkedList) {
+            String[] list = divideStringOnElements(a);
+            if (Integer.parseInt(list[0]) == textid) {
+
+                tangibleAndPersonForLeaving.idd = Integer.parseInt(list[0]);
+                tangibleAndPersonForLeaving.tangName = list[1];
+                tangibleAndPersonForLeaving.amount = Integer.parseInt(list[2]);
+                tangibleAndPersonForLeaving.measValue = list[3];
+                tangibleAndPersonForLeaving.priceForOne = Double.valueOf(list[4]);
+                tangibleAndPersonForLeaving.priceForAll = Double.valueOf(list[5]);
+                tangibleAndPersonForLeaving.responsible = list[6];
+                tangibleAndPersonForLeaving.debittingDate = LocalDate.parse(list[7]);
+
+                if ((Integer.parseInt(list[2]) - amount) > 0) {
+                    olist.add(new TangibleAndPerson(Integer.parseInt(list[0]),
+                            list[1],
+                            Integer.parseInt(list[2]) - amount,
+                            list[3],
+                            Double.parseDouble(list[4]),
+                            Double.parseDouble(list[5]),
+                            list[6],
+                            LocalDate.parse(list[7])));
+
+                    tangiblesssss.add(new TangibleAndPerson(Integer.parseInt(list[0]),
+                            list[1],
+                            Integer.parseInt(list[2]) - amount,
+                            list[3],
+                            Double.parseDouble(list[4]),
+                            Double.parseDouble(list[5]),
+                            list[6],
+                            LocalDate.parse(list[7])));
+                }
+            } else {
+                olist.add(new TangibleAndPerson(Integer.parseInt(list[0]),
+                        list[1],
+                        Integer.parseInt(list[2]),
+                        list[3],
+                        Double.parseDouble(list[4]),
+                        Double.parseDouble(list[5]),
+                        list[6],
+                        LocalDate.parse(list[7])));
+
+                tangiblesssss.add(new TangibleAndPerson(Integer.parseInt(list[0]),
+                        list[1],
+                        Integer.parseInt(list[2]),
+                        list[3],
+                        Double.parseDouble(list[4]),
+                        Double.parseDouble(list[5]),
+                        list[6],
+                        LocalDate.parse(list[7])));
+            }
+        }
+        this.clear();
+        tangiblesssss.forEach(this::writeData);
+        return olist;
+    }
 }

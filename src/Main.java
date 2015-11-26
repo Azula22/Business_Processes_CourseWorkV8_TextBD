@@ -206,19 +206,70 @@ public class Main extends Application {
             button_submit_adding.setOnAction((ActionEven) -> addTangibleToDB());
         });
 
-        button_handbook_of_property.setOnAction(ActionEvent->{
+        button_handbook_of_property.setOnAction(ActionEvent -> {
             tableViewTang.setItems(dataTangPers);
             mainVBox.getChildren().setAll(tableViewTang);
         });
 
-        button_motion_property.setOnAction(ActionEvent->{
+        button_motion_property.setOnAction(ActionEvent -> {
             tableViewMotion.setItems(dataMotion);
             mainVBox.getChildren().setAll(tableViewMotion);
         });
+
+        button_property_consumption.setOnAction(ActionEvent -> {
+            setInterfaceForPropertyLeaving();
+            button_submit_out.setOnAction((ActionEvent e) -> {
+                deleteAmountFromDB();
+            });
+        });
+    }
+
+    private void deleteAmountFromDB() {
+        int textid = Integer.parseInt(textFieldId.getText());
+        int amount = Integer.parseInt(textFieldsAmountOut.getText());
+        tangiblesDataBase.selledAmount = Integer.parseInt(textFieldsAmountOut.getText());
+        tangiblesDataBase.gettedMoney = Integer.parseInt(textFieldsPriceForOneOut.getText());
+
+        textFieldId.clear();
+        textFieldsAmountOut.clear();
+        textFieldsPriceForOneOut.clear();
+        //Переписати значення в БД мат.цінностей
+        dataTangPers = tangiblesDataBase.deleteTangiblesWithSettedAmount(textid, amount);
+
+        //Перевиведення БД матеріальних цінностей на екран
+        DBWork();
+
+        mainVBox.getChildren().setAll(hBoxTakeTangibles, button_submit_adding, tableViewTang, button_form_report_come);
+        //Зробити звіт
+        button_form_report_come.setOnAction((ActionEvent rep) -> {
+            formReportForLeaving();
+        });
+    }
+
+    private void formReportForLeaving() {
+        File file = new File("/home/anna/Business_Processes_MyReport/reports/leave/" + "Report" + generateNumberForMatLeave() + ".txt");
+
+        String content = "\t\t\t\t\t\t" + file.getName() + "\n\n\n" + "\t"
+                + "1. Назва матеріалу: " + tangiblesDataBase.tangibleAndPersonForLeaving.getTangName() + " ;\n\t"
+                + "2. Кількість: " + tangiblesDataBase.selledAmount + " " + tangiblesDataBase.tangibleAndPersonForLeaving.getMeasValue() + " ;\n\t"
+                + "3. Собівартість за одиницю : " + tangiblesDataBase.tangibleAndPersonForLeaving.getPriceForOne()  + " ;\n\t"
+                + "4. Собівартість за весь товар : " + tangiblesDataBase.tangibleAndPersonForLeaving.getPriceForOne()* tangiblesDataBase.selledAmount+ " ;\n\t"
+                + "5. Ціна продажу за одиницю : " + tangiblesDataBase.gettedMoney+ " ;\n\t"
+                + "6. Ціна продажу за весь товар : " + tangiblesDataBase.gettedMoney* tangiblesDataBase.selledAmount+ " ;\n\t"
+                + "7. Відповідальна особа: " + tangiblesDataBase.tangibleAndPersonForLeaving.getResponsible() + " ;\n\t"
+                + "8. Кінцевий термін експлуатації матеріалу: " + tangiblesDataBase.tangibleAndPersonForLeaving.getDebittingDate() + " ;\n\t"
+                + "\n\n\n\t\t\t\t\t\t\t\t\t\tДата витрати матеріалу та складання звіту: " + LocalDate.now().toString();
+        generateFile(file, content);
+    }
+
+    private void setInterfaceForPropertyLeaving() {
+        hBoxTakeTangibles.getChildren().setAll(textFieldId,
+                textFieldsAmountOut, textFieldsPriceForOneOut);
+        mainVBox.getChildren().setAll(hBoxTakeTangibles, button_submit_out, tableViewTang);
     }
 
     private void formReportForComing(TangibleAndPerson tangible) {
-        File file = new File("/home/anna/Business_Processes_MyReport/reports/come/" + "Report" + generateNumberForMatCome() + ".txt");
+        File file = new File("/home/anna/Business_Processes_MyReport/reports/come/" + "Report" + generateNumberForMatLeave() + ".txt");
 
         String content = "\t\t\t\t\t\t" + file.getName() + "\n\n\n" + "\t"
                 + "1. Назва матеріалу: " + tangible.tangName + " ;\n\t"
