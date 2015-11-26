@@ -87,6 +87,7 @@ public class TangiblePersonDatabase implements ManageData {
         LinkedList linkedList = this.readData();
         for (Object a : linkedList) {
             String[] list = divideStringOnElements(a);
+
             if (Integer.parseInt(list[0]) == textid) {
 
                 tangibleAndPersonForLeaving.idd = Integer.parseInt(list[0]);
@@ -137,6 +138,8 @@ public class TangiblePersonDatabase implements ManageData {
                         LocalDate.parse(list[7])));
             }
         }
+
+
         this.clear();
         tangiblesssss.forEach(this::writeData);
         return olist;

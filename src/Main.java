@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.LinkedList;
 
 public class Main extends Application {
 
@@ -80,7 +81,6 @@ public class Main extends Application {
     Button button_writeOff_property = new Button("Списані матеріальні цінності");
     Button button_attorney = new Button("Виписка довіреностей");
     Button button_form_report_come = new Button("Cформувати звіт");
-    Button button_form_report_out = new Button("Cформувати звіт");
     VBox buttonsVBox = new VBox();
 
     HBox startingHBox = new HBox();
@@ -93,6 +93,10 @@ public class Main extends Application {
     //Для зображення БД руху
     MotionDatabase motionDataBase = new MotionDatabase();
     private ObservableList dataMotion = FXCollections.observableArrayList();
+
+    //Для зображення списаних матеріальних цінностей
+    WriteOffDatabase writeOffDatabase = new WriteOffDatabase();
+    private  ObservableList dataWriteOff = FXCollections.observableArrayList();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -114,8 +118,10 @@ public class Main extends Application {
     void DBWork() {
         motionDataBase.checkIfCreated();
         tangiblesDataBase.checkIfCreated();
+        writeOffDatabase.checkIfCreated();
         dataTangPers = tangiblesDataBase.listFromReaded();
         dataMotion = motionDataBase.listFromReaded();
+        dataWriteOff = writeOffDatabase.listFromReader();
         tableViewTang.setItems(dataTangPers);
     }
 
@@ -171,7 +177,17 @@ public class Main extends Application {
     }
 
     void makeTableForWriteOff() {
-        //TODO table
+        tableViewWriteOff.setPrefWidth(1000);
+        clmn_NameWriteOff.setCellValueFactory(new PropertyValueFactory<>("name"));
+        clmn_DateOfWriteOff.setCellValueFactory(new PropertyValueFactory<>("debittingDate"));
+        clmn_dateAmountWriteOff.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        clmn_datePriceWriteOff.setCellValueFactory(new PropertyValueFactory<>("money"));
+        clmn_dateMeasValWriteOff.setCellValueFactory(new PropertyValueFactory<>("measVal"));
+        tableViewWriteOff.getColumns().setAll(clmn_NameWriteOff,
+                clmn_DateOfWriteOff,
+                clmn_dateAmountWriteOff,
+                clmn_dateMeasValWriteOff,
+                clmn_datePriceWriteOff);
     }
 
     void makeTableForMotion() {
@@ -222,6 +238,33 @@ public class Main extends Application {
                 deleteAmountFromDB();
             });
         });
+
+        button_writeOff_property.setOnAction((ActionEvent) -> {
+            setInterfaceForWritingOffProperty();
+            lookForWriteOff();
+            tableViewWriteOff.setItems(dataWriteOff);
+            mainVBox.getChildren().setAll(tableViewWriteOff);
+        });
+    }
+
+    private void lookForWriteOff() {
+        LinkedList list = tangiblesDataBase.readData();
+        for(Object a: list){
+            String[] lists = a.toString().split("<>@#_");
+            if(LocalDate.parse(lists[7]).isBefore(LocalDate.now())){
+                WriteOffTangible writeOffTangible = new WriteOffTangible(lists[1],
+                        LocalDate.parse(lists[7]),
+                        Integer.parseInt(lists[2]),
+                        lists[3],
+                        Double.parseDouble(lists[5]));
+                writeOffDatabase.writeData(writeOffTangible);
+                tangiblesDataBase.deleteTangiblesWithSettedAmount(Integer.parseInt(lists[0]),Integer.parseInt(lists[2]));
+            }
+        }
+    }
+
+    private void setInterfaceForWritingOffProperty() {
+        mainVBox.getChildren().setAll(tableViewWriteOff);
     }
 
     private void deleteAmountFromDB() {
@@ -235,7 +278,7 @@ public class Main extends Application {
         textFieldsPriceForOneOut.clear();
         //Переписати значення в БД мат.цінностей
         dataTangPers = tangiblesDataBase.deleteTangiblesWithSettedAmount(textid, amount);
-        Motion motion = new Motion(tangiblesDataBase.tangibleAndPersonForLeaving.getTangName(), " - " + tangiblesDataBase.selledAmount, " + " + tangiblesDataBase.gettedMoney*tangiblesDataBase.selledAmount, LocalDate.now());
+        Motion motion = new Motion(tangiblesDataBase.tangibleAndPersonForLeaving.getTangName(), " - " + tangiblesDataBase.selledAmount, " + " + tangiblesDataBase.gettedMoney * tangiblesDataBase.selledAmount, LocalDate.now());
 
         motionDataBase.writeData(motion);
 
@@ -256,10 +299,10 @@ public class Main extends Application {
         String content = "\t\t\t\t\t\t" + file.getName() + "\n\n\n" + "\t"
                 + "1. Назва матеріалу: " + tangiblesDataBase.tangibleAndPersonForLeaving.getTangName() + " ;\n\t"
                 + "2. Кількість: " + tangiblesDataBase.selledAmount + " " + tangiblesDataBase.tangibleAndPersonForLeaving.getMeasValue() + " ;\n\t"
-                + "3. Собівартість за одиницю : " + tangiblesDataBase.tangibleAndPersonForLeaving.getPriceForOne()  + " ;\n\t"
-                + "4. Собівартість за весь товар : " + tangiblesDataBase.tangibleAndPersonForLeaving.getPriceForOne()* tangiblesDataBase.selledAmount+ " ;\n\t"
-                + "5. Ціна продажу за одиницю : " + tangiblesDataBase.gettedMoney+ " ;\n\t"
-                + "6. Ціна продажу за весь товар : " + tangiblesDataBase.gettedMoney* tangiblesDataBase.selledAmount+ " ;\n\t"
+                + "3. Собівартість за одиницю : " + tangiblesDataBase.tangibleAndPersonForLeaving.getPriceForOne() + " ;\n\t"
+                + "4. Собівартість за весь товар : " + tangiblesDataBase.tangibleAndPersonForLeaving.getPriceForOne() * tangiblesDataBase.selledAmount + " ;\n\t"
+                + "5. Ціна продажу за одиницю : " + tangiblesDataBase.gettedMoney + " ;\n\t"
+                + "6. Ціна продажу за весь товар : " + tangiblesDataBase.gettedMoney * tangiblesDataBase.selledAmount + " ;\n\t"
                 + "7. Відповідальна особа: " + tangiblesDataBase.tangibleAndPersonForLeaving.getResponsible() + " ;\n\t"
                 + "8. Кінцевий термін експлуатації матеріалу: " + tangiblesDataBase.tangibleAndPersonForLeaving.getDebittingDate() + " ;\n\t"
                 + "\n\n\n\t\t\t\t\t\t\t\t\t\tДата витрати матеріалу та складання звіту: " + LocalDate.now().toString();
@@ -273,7 +316,7 @@ public class Main extends Application {
     }
 
     private void formReportForComing(TangibleAndPerson tangible) {
-        File file = new File("/home/anna/Business_Processes_MyReport/reports/come/" + "Report" + generateNumberForMatLeave() + ".txt");
+        File file = new File("/home/anna/Business_Processes_MyReport/reports/come/" + "Report" + generateNumberForMatCome() + ".txt");
 
         String content = "\t\t\t\t\t\t" + file.getName() + "\n\n\n" + "\t"
                 + "1. Назва матеріалу: " + tangible.tangName + " ;\n\t"
@@ -296,7 +339,7 @@ public class Main extends Application {
     }
 
     String generateNumberForMatLeave() {
-        File file = new File("/home/anna/Business_Processes/src/reports/leave/");
+        File file = new File("/home/anna/Business_Processes_MyReport/reports/leave/");
         String[] cn = file.list();
         if (cn == null) {
             return "1";
