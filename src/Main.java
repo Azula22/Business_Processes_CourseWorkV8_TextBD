@@ -235,6 +235,9 @@ public class Main extends Application {
         textFieldsPriceForOneOut.clear();
         //Переписати значення в БД мат.цінностей
         dataTangPers = tangiblesDataBase.deleteTangiblesWithSettedAmount(textid, amount);
+        Motion motion = new Motion(tangiblesDataBase.tangibleAndPersonForLeaving.getTangName(), " - " + tangiblesDataBase.selledAmount, " + " + tangiblesDataBase.gettedMoney*tangiblesDataBase.selledAmount, LocalDate.now());
+
+        motionDataBase.writeData(motion);
 
         //Перевиведення БД матеріальних цінностей на екран
         DBWork();
@@ -243,6 +246,7 @@ public class Main extends Application {
         //Зробити звіт
         button_form_report_come.setOnAction((ActionEvent rep) -> {
             formReportForLeaving();
+
         });
     }
 
@@ -319,7 +323,7 @@ public class Main extends Application {
                 Double.parseDouble(textFieldsPrice.getText()) * Integer.parseInt(textFieldsAmount.getText()),
                 textFieldsPersons.getText(),
                 datePickersDebitting.getValue());
-        Motion motion = new Motion(tangible.getTangName(), " + " + tangible.getAmount(), " + " + tangible.getPriceForAll(), LocalDate.now());
+        Motion motion = new Motion(tangible.getTangName(), " + " + tangible.getAmount(), " - " + tangible.getPriceForAll(), LocalDate.now());
 
         tangiblesDataBase.writeData(tangible);
         motionDataBase.writeData(motion);
